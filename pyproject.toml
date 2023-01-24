@@ -1,0 +1,20 @@
+[project]
+name = "ChensBOTv2"
+version = "0.1.0"
+description = "ChensBOTv2"
+readme = "README.md"
+requires-python = ">=3.8, <4.0"
+
+[tool.nonebot]
+adapters = [
+    { name = "Telegram", module_name = "nonebot.adapters.telegram" },
+    { name = "QQ 频道", module_name = "nonebot.adapters.qqguild" },
+    { name = "mirai2", module_name = "nonebot.adapters.mirai2" },
+    { name = "OneBot V12", module_name = "nonebot.adapters.onebot.v12" },
+    { name = "Ntchat", module_name = "nonebot.adapters.ntchat" },
+    { name = "Spigot", module_name = "nonebot.adapters.spigot" },
+    { name = "BilibiliLive", module_name = "nonebot.adapter.bilibili" }
+]
+plugins = []
+plugin_dirs = ["src/plugins"]
+builtin_plugins = []
