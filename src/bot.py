@@ -52,16 +52,12 @@ else:
     print('数据库检查通过，准备运行')
     time.sleep(3)
 
-nonebot.init(config)
-bot = nonebot.get_bot()
-app = bot.asgi
-
 if __name__ == '__main__':
     nonebot.init()
 
     nonebot.load_plugins(
-        os.path.join(os.path.dirname(__file__), 'awesome', 'plugins'),
-        'awesome.plugins'
+        os.path.join(os.path.dirname(__file__), 'src', 'plugins'),
+        'src.plugins'
     )
     
     nonebot.run()
