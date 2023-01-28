@@ -103,4 +103,5 @@ else:
 
 nonebot.init()
 nonebot.load_all_plugins(['src/plugins'])
+app = nonebot.get_asgi()
 nonebot.run()
