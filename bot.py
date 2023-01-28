@@ -37,7 +37,7 @@ if 'ChensBOTv2' not in dblist:
 
     kick_dict = {'version' : version, 'rootuser' : [rootuser_input], 't0_op' : [], 't1_op' : [], 't2_op' : []}
     kick_col.insert_one(kick_dict)
-    print('导入1/7')
+    print('导入1/8')
 
     grpmembers_col = db['grp_members']
     grpmembers_dict = {
@@ -56,22 +56,22 @@ if 'ChensBOTv2' not in dblist:
                 'else' : 'x'
             }
     grpmembers_col.insert_one(grpmembers_dict)
-    print('导入2/7')
+    print('导入2/8')
 
     mute_col = db['mutelist']
     mute_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x', 'mute_time' : 'x', 'performer' : 'x'}
     mute_col.insert_one(kick_dict)
-    print('导入3/7')
+    print('导入3/8')
 
     kick_col = db['kicklist']
     kick_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x', 'reason' : 'x', 'performer' : 'x'}
     kick_col.insert_one(kick_dict)
-    print('导入4/7')
+    print('导入4/8')
 
     ban_col = db['banlist']
     ban_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x', 'reason' : 'x', 'performer' : 'x'}
     ban_col.insert_one(ban_dict)
-    print('导入5/7')
+    print('导入5/8')
 
     sfz_col = db['sfz']
     f = open('src/static/text/90亿身份证信息.txt', 'r', encoding='GBK', errors='ignore')
@@ -80,7 +80,7 @@ if 'ChensBOTv2' not in dblist:
         n = str(int(n) + 1)
         sfz_dict = {'num' : n, 'info' : i}
         sfz_col.insert_one(sfz_dict)
-    print('导入6/7')
+    print('导入6/8')
 
     sf_col = db['sf']
     f = open('src/static/text/十万顺丰快递.txt', 'r', encoding='GBK', errors='ignore')
@@ -89,12 +89,12 @@ if 'ChensBOTv2' not in dblist:
         n = str(int(n) + 1)
         sf_dict = {'num' : n, 'info' : i}
         sf_col.insert_one(sf_dict)
-    print('导入7/7')
+    print('导入7/8')
 
-    roll_col = db['banlist']
+    roll_col = db['roll']
     roll_dict = {'time' : 'x', 'roll_code' : 'x', 'uuid' : 'x', 'qid' : 'x'}
     roll_col.insert_one(roll_dict)
-    print('导入5/7')
+    print('导入8/8')
 
     print('导入完成')
 else:
