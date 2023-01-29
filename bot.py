@@ -1,3 +1,4 @@
+from nonebot.adapters.onebot.v12 import Adapter as onebotv12_adapter
 import nonebot
 import pymongo
 import time
@@ -11,7 +12,6 @@ client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
 dblist = client.list_database_names()
 if 'ChensBOTv2' not in dblist:
     print('首次运行，准备创建数据库（注意：请按照提示执行）')
-    print('三秒后开始导入，请等待提示导入完成')
     time.sleep(3)
     
     db = client['ChensBOTv2']
@@ -101,7 +101,12 @@ else:
     print('数据库检查通过，准备运行')
     time.sleep(3)
 
-nonebot.init()
-nonebot.load_all_plugins(['src/plugins'])
-app = nonebot.get_asgi()
-nonebot.run()
+if __name__ == '__main__':
+    nonebot.init()
+
+    driver = nonebot.get_driver()
+    driver.register_adapter(onebotv12_adapter)
+
+    nonebot.load_plugins('src/plugins')
+
+    nonebot.run()
