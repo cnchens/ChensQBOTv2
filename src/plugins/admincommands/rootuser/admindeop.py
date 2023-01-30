@@ -14,9 +14,9 @@ db = client['ChensBOTv2']
 
 config_col = db['cb_config']
 
-admingiveop = on_command('admingiveop')
+admindeop = on_command('admindeop')
 
-@admingiveop.handle()
+@admindeop.handle()
 async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
     receive_msg = str(rxmsg).strip().split()
     request_qid = str(event.user_id)
@@ -41,16 +41,12 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
 '''
 错误：语法错误
 示例：
-/admingiveop [GRPID] [OP_LEVEL] [QID]
+/admindeop [GRPID] [QID]
 GRPID：
 this -> 本群
 或指定某群ID
-OP_LEVEL：
-0   最高权限（次于rootuser权限）
-1   中等权限
-2   最低权限
 QID：
-给予OP权限的QID
+解除OP权限的QID
 '''.strip()
                         )
                 else:
@@ -71,16 +67,12 @@ QID：
 '''
 错误：语法错误
 示例：
-/admingiveop [GRPID] [OP_LEVEL] [QID]
+/admindeop [GRPID] [QID]
 GRPID：
 this -> 本群
 或指定某群ID
-OP_LEVEL：
-0   最高权限（次于rootuser权限）
-1   中等权限
-2   最低权限
 QID：
-给予OP权限的QID
+解除OP权限的QID
 '''.strip()
                         )
             except:
@@ -89,16 +81,12 @@ QID：
             await admingiveop.send(
 '''
 示例：
-/admingiveop [GRPID] [OP_LEVEL] [QID]
+/admindeop [GRPID] [QID]
 GRPID：
 this -> 本群
 或指定某群ID
-OP_LEVEL：
-0   最高权限（次于rootuser权限）
-1   中等权限
-2   最低权限
 QID：
-给予OP权限的QID
+解除OP权限的QID
 '''.strip()
             )
     else:

@@ -35,7 +35,7 @@ if 'ChensBOTv2' not in dblist:# mongodb初始化
 
     version = 'v1.0.0b'
 
-    kick_dict = {'version' : version, 'rootuser' : [rootuser_input], 't0_op' : [{'qid' : 'x', 'grp' : 'x'}], 't1_op' : [{'qid' : 'x', 'grp' : 'x'}], 't2_op' : [{'qid' : 'x', 'grp' : 'x'}]}
+    kick_dict = {'_id' : '0', 'version' : version, 'rootuser' : [rootuser_input], 't0_op' : [{'qid' : 'x', 'grp' : 'x'}], 't1_op' : [{'qid' : 'x', 'grp' : 'x'}], 't2_op' : [{'qid' : 'x', 'grp' : 'x'}]}
     kick_col.insert_one(kick_dict)
     print('导入1/8')
 
