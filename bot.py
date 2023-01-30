@@ -1,4 +1,4 @@
-from nonebot.adapters.onebot.v12 import Adapter as onebotv12_adapter
+from nonebot.adapters.onebot.v11 import Adapter as onebotv11_adapter
 import nonebot
 import pymongo
 import time
@@ -10,7 +10,7 @@ mdb_conn = json_res['mdb_conn']# mongodb连接地址
 
 client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
 dblist = client.list_database_names()
-if 'ChensBOTv2' not in dblist:
+if 'ChensBOTv2' not in dblist:# mongodb初始化
     print('首次运行，准备创建数据库（注意：请按照提示执行）')
     time.sleep(3)
     
@@ -35,7 +35,7 @@ if 'ChensBOTv2' not in dblist:
 
     version = 'v1.0.0b'
 
-    kick_dict = {'version' : version, 'rootuser' : [rootuser_input], 't0_op' : [], 't1_op' : [], 't2_op' : []}
+    kick_dict = {'version' : version, 'rootuser' : [rootuser_input], 't0_op' : [{'qid' : 'x', 'grp' : 'x'}], 't1_op' : [{'qid' : 'x', 'grp' : 'x'}], 't2_op' : [{'qid' : 'x', 'grp' : 'x'}]}
     kick_col.insert_one(kick_dict)
     print('导入1/8')
 
@@ -105,8 +105,15 @@ if __name__ == '__main__':
     nonebot.init()
 
     driver = nonebot.get_driver()
-    driver.register_adapter(onebotv12_adapter)
+    driver.register_adapter(onebotv11_adapter)
 
-    nonebot.load_plugins('src/plugins/bot', 'src/plugins/commands', 'src/plugins/groupmgmt')
+    nonebot.load_plugins(
+        'src/plugins/commands', # 指令
+        'src/plugins/groupmgmt', # 群管理
+        'src/plugins/admincommands/rootuser', # 根用户指令
+        'src/plugins/admincommands/t0op', # t0权限管理员指令
+        'src/plugins/admincommands/t1op', # t1权限管理员指令
+        'src/plugins/admincommands/t2op' # t2权限管理员指令
+    )
 
     nonebot.run()
