@@ -31,7 +31,15 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
     receive_msg = str(rxmsg).strip().split()
     request_qid = str(event.user_id)
     request_grpid = str(event.group_id)
-    if request_qid in rootuser_col.find_one()['rootuser']:
+    isrootuser = False
+    for i in rootuser_col.find():
+        if request_qid == i['qid']:
+            isrootuser = True
+            break
+        else:
+            isrootuser = False
+            pass
+    if isrootuser == True:
         if len(receive_msg) == 4:
             try:
                 if receive_msg[1] == 'this':
