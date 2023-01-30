@@ -29,15 +29,15 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
                     qid = receive_msg[3]
                     if op_level == '0':
                         config_col.update_many({'_id' : '0'}, {'$push' : {'t0_op' : {'qid' : qid, 'grp' : request_grpid}}})
-                        await admingiveop.send(f'成功\n群组：{request_grpid}\n管理员：{qid}\n权限等级：{op_level}')
+                        await admindeop.send(f'成功\n群组：{request_grpid}\n管理员：{qid}\n权限等级：{op_level}')
                     elif op_level == '1':
                         config_col.update_many({'_id' : '0'}, {'$push' : {'t1_op' : {'qid' : qid, 'grp' : request_grpid}}})
-                        await admingiveop.send(f'成功\n群组：{request_grpid}\n管理员：{qid}\n权限等级：{op_level}')
+                        await admindeop.send(f'成功\n群组：{request_grpid}\n管理员：{qid}\n权限等级：{op_level}')
                     elif op_level == '2':
                         config_col.update_many({'_id' : '0'}, {'$push' : {'t2_op' : {'qid' : qid, 'grp' : request_grpid}}})
-                        await admingiveop.send(f'成功\n群组：{request_grpid}\n管理员：{qid}\n权限等级：{op_level}')
+                        await admindeop.send(f'成功\n群组：{request_grpid}\n管理员：{qid}\n权限等级：{op_level}')
                     else:
-                        await admingiveop.send(
+                        await admindeop.send(
 '''
 错误：语法错误
 示例：
@@ -55,15 +55,15 @@ QID：
                     qid = receive_msg[3]
                     if op_level == '0':
                         config_col.update_many({'_id' : '0'}, {'$push' : {'t0_op' : {'qid' : qid, 'grp' : grpid}}})
-                        await admingiveop.send(f'成功\n群组：{grpid}\n管理员：{qid}\n权限等级：{op_level}')
+                        await admindeop.send(f'成功\n群组：{grpid}\n管理员：{qid}\n权限等级：{op_level}')
                     elif op_level == '1':
                         config_col.update_many({'_id' : '0'}, {'$push' : {'t1_op' : {'qid' : qid, 'grp' : grpid}}})
-                        await admingiveop.send(f'成功\n群组：{grpid}\n管理员：{qid}\n权限等级：{op_level}')
+                        await admindeop.send(f'成功\n群组：{grpid}\n管理员：{qid}\n权限等级：{op_level}')
                     elif op_level == '2':
                         config_col.update_many({'_id' : '0'}, {'$push' : {'t2_op' : {'qid' : qid, 'grp' : grpid}}})
-                        await admingiveop.send(f'成功\n群组：{grpid}\n管理员：{qid}\n权限等级：{op_level}')
+                        await admindeop.send(f'成功\n群组：{grpid}\n管理员：{qid}\n权限等级：{op_level}')
                     else:
-                        await admingiveop.send(
+                        await admindeop.send(
 '''
 错误：语法错误
 示例：
@@ -76,9 +76,9 @@ QID：
 '''.strip()
                         )
             except:
-                await admingiveop.send('错误：运行错误')
+                await admindeop.send('错误：运行错误')
         else:
-            await admingiveop.send(
+            await admindeop.send(
 '''
 示例：
 /admindeop [GRPID] [QID]
@@ -90,6 +90,6 @@ QID：
 '''.strip()
             )
     else:
-        await admingiveop.send(f'错误：权限不足')
+        await admindeop.send(f'错误：权限不足')
 
     

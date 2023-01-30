@@ -5,22 +5,34 @@
 import pymongo
 import json
 
-f = open('src/config/chensbot_config.json', 'r', encoding='utf-8')# 读取config
-json_res = json.load(f)
-mdb_conn = json_res['mdb_conn']# mongodb连接地址
+# import time
+# for i in range(15):
+#     time.sleep(0.5)
+#     print('\r', "{:d}".format(15-i), end='', flush=True)
+# 
 
-client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
-db = client['ChensBOTv2']
+# f = open('src/config/chensbot_config.json', 'r', encoding='utf-8')# 读取config
+# json_res = json.load(f)
+# mdb_conn = json_res['mdb_conn']# mongodb连接地址
+# 
+# client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
+# db = client['ChensBOTv2']
+# 
+# config_col = db['cb_config']
+# 
+# 
+# x = config_col.update_many({'t0_op' : {'qid' : '123', 'grp' : '114'}}, {'$set' : {'t0_op' : {'qid' : '114514', 'grp' : '1919710'}}})
+# # test = on_command('test')
+# 
+# # x = config_col.update_many({'_id' : '0'}, {'$push' : {'t0_op' : {'qid' : '1144', 'grp' : '414'}}})
+# print(x.matched_count)
+# print(type(x.matched_count))
+# print(x.modified_count)
+# print(type(x.modified_count))
 
-config_col = db['cb_config']
-
-# test = on_command('test')
-
-# config_col.update_many({'_id' : '0'}, {'$push' : {'t0_op' : {'qid' : 'x', 'grp' : 'x'}}})
-
-for i in config_col.find():
-    for j in i['t0_op']:
-        print(j['qid'])
+# for i in config_col.find():
+#     for j in i['t0_op']:
+#         print(j['qid'])
 
 # @test.handle()
 # async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):

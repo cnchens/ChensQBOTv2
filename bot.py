@@ -3,21 +3,28 @@ import nonebot
 import pymongo
 import time
 import json
+import datetime
+import pytz
+import tqdm
 
 f = open('src/config/chensbot_config.json', 'r', encoding='utf-8')# 读取config
 json_res = json.load(f)
 mdb_conn = json_res['mdb_conn']# mongodb连接地址
+timezone = json_res['timezone']# 时区 默认Asia/Shanghai
 
 client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
 dblist = client.list_database_names()
 if 'ChensBOTv2' not in dblist:# mongodb初始化
-    print('首次运行，准备创建数据库（注意：请按照提示执行）')
-    time.sleep(3)
+    for i in range(5):
+        time.sleep(1)
+        print('\r', '首次运行，准备创建数据库（注意：请按照提示执行） ' + '{:d}'.format(4-i), end='', flush=True)
+    print('\n')
     
     db = client['ChensBOTv2']
 
-    kick_col = db['cb_config']
+    gmt8_time = datetime.datetime.now(tz=pytz.timezone(timezone)).strftime('%Y-%m-%d %H:%M:%S')
 
+    rootuser_col = db['admin_rootuser']
     isint = False
     rootuser_input = 0
     while isint == False:
@@ -30,14 +37,31 @@ if 'ChensBOTv2' not in dblist:# mongodb初始化
             print('请输入正确的QQ号')
             isint = False
             continue
-    
     rootuser_input = str(rootuser_input)
+    rootuser_dict = {'time' : gmt8_time, 'qid' : rootuser_input}
+    rootuser_col.insert_one(rootuser_dict)
+    print('已经导入1个集合')
 
+    t0op_col = db['admin_t0op']
+    t0op_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x'}
+    t0op_col.insert_one(t0op_dict)
+    print('已经导入2个集合')
+
+    t1op_col = db['admin_t1op']
+    t1op_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x'}
+    t1op_col.insert_one(t1op_dict)
+    print('已经导入3个集合')
+
+    t2op_col = db['admin_t2op']
+    t2op_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x'}
+    t2op_col.insert_one(t2op_dict)
+    print('已经导入4个集合')
+
+    config_col = db['cb_config']
     version = 'v1.0.0b'
-
-    kick_dict = {'_id' : '0', 'version' : version, 'rootuser' : [rootuser_input], 't0_op' : [{'qid' : 'x', 'grp' : 'x'}], 't1_op' : [{'qid' : 'x', 'grp' : 'x'}], 't2_op' : [{'qid' : 'x', 'grp' : 'x'}]}
-    kick_col.insert_one(kick_dict)
-    print('导入1/8')
+    config_dict = {'version' : version}
+    config_col.insert_one(config_dict)
+    print('已经导入5个集合')
 
     grpmembers_col = db['grp_members']
     grpmembers_dict = {
@@ -56,22 +80,22 @@ if 'ChensBOTv2' not in dblist:# mongodb初始化
                 'else' : 'x'
             }
     grpmembers_col.insert_one(grpmembers_dict)
-    print('导入2/8')
+    print('已经导入6个集合')
 
     mute_col = db['mutelist']
     mute_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x', 'mute_time' : 'x', 'performer' : 'x'}
-    mute_col.insert_one(kick_dict)
-    print('导入3/8')
+    mute_col.insert_one(mute_dict)
+    print('已经导入7个集合')
 
     kick_col = db['kicklist']
     kick_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x', 'reason' : 'x', 'performer' : 'x'}
     kick_col.insert_one(kick_dict)
-    print('导入4/8')
+    print('已经导入8个集合')
 
     ban_col = db['banlist']
     ban_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x', 'reason' : 'x', 'performer' : 'x'}
     ban_col.insert_one(ban_dict)
-    print('导入5/8')
+    print('已经导入9个集合')
 
     sfz_col = db['sfz']
     f = open('src/static/text/90亿身份证信息.txt', 'r', encoding='GBK', errors='ignore')
@@ -80,7 +104,8 @@ if 'ChensBOTv2' not in dblist:# mongodb初始化
         n = str(int(n) + 1)
         sfz_dict = {'num' : n, 'info' : i}
         sfz_col.insert_one(sfz_dict)
-    print('导入6/8')
+        print('\r', f'写入密集：此集合已导入{n}条数据', end='', flush=True)
+    print('\n已经导入10个集合')
 
     sf_col = db['sf']
     f = open('src/static/text/十万顺丰快递.txt', 'r', encoding='GBK', errors='ignore')
@@ -89,17 +114,22 @@ if 'ChensBOTv2' not in dblist:# mongodb初始化
         n = str(int(n) + 1)
         sf_dict = {'num' : n, 'info' : i}
         sf_col.insert_one(sf_dict)
-    print('导入7/8')
+        print('\r', f'写入密集：此集合已导入{n}条数据', end='', flush=True)
+    print('\n已经导入11个集合')
 
     roll_col = db['roll']
     roll_dict = {'time' : 'x', 'roll_code' : 'x', 'uuid' : 'x', 'qid' : 'x'}
     roll_col.insert_one(roll_dict)
-    print('导入8/8')
+    print('已经导入12个集合')
 
     print('导入完成')
+
+    time.sleep(1)
 else:
-    print('数据库检查通过，准备运行')
-    time.sleep(3)
+    for i in range(5):
+        time.sleep(1)
+        print('\r', '数据库检查通过，准备运行 ' + '{:d}'.format(4-i), end='', flush=True)
+    print('\n')
 
 if __name__ == '__main__':
     nonebot.init()
@@ -114,7 +144,7 @@ if __name__ == '__main__':
         'src/plugins/admincommands/t0op', # t0权限管理员指令
         'src/plugins/admincommands/t1op', # t1权限管理员指令
         'src/plugins/admincommands/t2op', # t2权限管理员指令
-        'src/plugins/test' # 测试
+        # 'src/plugins/test' # 测试
     )
 
     nonebot.run()
