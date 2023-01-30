@@ -4,7 +4,7 @@ import pymongo
 import time
 import json
 
-f = open('chensbot_config.json', 'r', encoding='utf-8')# 读取config
+f = open('src/config/chensbot_config.json', 'r', encoding='utf-8')# 读取config
 json_res = json.load(f)
 mdb_conn = json_res['mdb_conn']# mongodb连接地址
 
@@ -107,6 +107,6 @@ if __name__ == '__main__':
     driver = nonebot.get_driver()
     driver.register_adapter(onebotv12_adapter)
 
-    nonebot.load_plugins('src/plugins')
+    nonebot.load_plugins('src/plugins/bot', 'src/plugins/commands', 'src/plugins/groupmgmt')
 
     nonebot.run()
