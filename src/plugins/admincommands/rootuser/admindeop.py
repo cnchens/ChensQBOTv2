@@ -4,8 +4,6 @@ from nonebot.params import EventMessage
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 import pymongo
 import json
-import datetime
-import pytz
 
 f = open('src/config/chensbot_config.json', 'r', encoding='utf-8')# 读取config
 json_res = json.load(f)
@@ -20,9 +18,9 @@ t0op_col = db['admin_t0op']
 t1op_col = db['admin_t1op']
 t2op_col = db['admin_t2op']
 
-admindeop = on_command('admindeop')
+matcher = on_command('admindeop')
 
-@admindeop.handle()
+@matcher.handle()
 async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
     receive_msg = str(rxmsg).strip().split()
     request_qid = str(event.user_id)
@@ -44,7 +42,7 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
                     delcount_t1 = t1op_col.delete_many({'grp' : request_grpid, 'qid' : qid}).deleted_count
                     delcount_t2 = t2op_col.delete_many({'grp' : request_grpid, 'qid' : qid}).deleted_count
                     delcount = str(delcount_t0 + delcount_t1 + delcount_t2)
-                    await admindeop.send(f'群组：{request_grpid}\n管理员：{qid}\n找到了{delcount}个符合的数据')
+                    await matcher.send(f'群组：{request_grpid}\n管理员：{qid}\n找到了{delcount}个符合的数据')
                 else:
                     grpid = receive_msg[1]
                     qid = receive_msg[3]
@@ -52,11 +50,11 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
                     delcount_t1 = t1op_col.delete_many({'grp' : grpid, 'qid' : qid}).deleted_count
                     delcount_t2 = t2op_col.delete_many({'grp' : grpid, 'qid' : qid}).deleted_count
                     delcount = str(delcount_t0 + delcount_t1 + delcount_t2)
-                    await admindeop.send(f'群组：{grpid}\n管理员：{qid}\n找到了{delcount}个符合的数据')
+                    await matcher.send(f'群组：{grpid}\n管理员：{qid}\n找到了{delcount}个符合的数据')
             except:
-                await admindeop.send('错误：运行错误')
+                await matcher.send('错误：运行错误')
         else:
-            await admindeop.send(
+            await matcher.send(
 '''
 示例：
 /admindeop [GRPID] [QID]
@@ -68,6 +66,6 @@ QID：
 '''.strip()
             )
     else:
-        await admindeop.send(f'错误：权限不足')
+        await matcher.send(f'错误：权限不足')
 
     

@@ -138,6 +138,7 @@ if __name__ == '__main__':
     nonebot.load_plugins(
         'src/plugins/commands', # 指令
         'src/plugins/groupmgmt', # 群管理
+        'src/plugins/admincommands/global_admincommands', # 全局管理员指令
         'src/plugins/admincommands/rootuser', # 根用户指令
         'src/plugins/admincommands/t0op', # t0权限管理员指令
         'src/plugins/admincommands/t1op', # t1权限管理员指令
