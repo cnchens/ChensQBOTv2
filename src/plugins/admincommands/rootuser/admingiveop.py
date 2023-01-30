@@ -20,10 +20,6 @@ t0op_col = db['admin_t0op']
 t1op_col = db['admin_t1op']
 t2op_col = db['admin_t2op']
 
-for i in config_col.find():
-    timezone = i['timezone']
-mdbtz_time = datetime.datetime.now(tz=pytz.timezone(timezone)).strftime('%Y-%m-%d %H:%M:%S')
-
 admingiveop = on_command('admingiveop')
 
 @admingiveop.handle()
@@ -40,6 +36,10 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
             isrootuser = False
             pass
     if isrootuser == True:
+        mdbtz_time = ''
+        for i in config_col.find():
+            timezone = i['timezone']
+            mdbtz_time = datetime.datetime.now(tz=pytz.timezone(timezone)).strftime('%Y-%m-%d %H:%M:%S')
         if len(receive_msg) == 4:
             try:
                 if receive_msg[1] == 'this':
