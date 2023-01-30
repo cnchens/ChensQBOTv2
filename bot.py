@@ -10,8 +10,6 @@ f = open('src/config/chensbot_config.json', 'r', encoding='utf-8')# 读取config
 json_res = json.load(f)
 mdb_conn = json_res['mdb_conn']# mongodb连接地址
 
-timezone = 'Asia/Shanghai'# 时区 默认Asia/Shanghai
-
 client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
 dblist = client.list_database_names()
 if 'ChensBOTv2' not in dblist:# mongodb初始化
@@ -22,7 +20,7 @@ if 'ChensBOTv2' not in dblist:# mongodb初始化
 
     db = client['ChensBOTv2']
 
-    gmt8_time = datetime.datetime.now(tz=pytz.timezone(timezone)).strftime('%Y-%m-%d %H:%M:%S')
+    gmt8_time = datetime.datetime.now(tz=pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
 
     rootuser_col = db['admin_rootuser']
     isint = False
@@ -59,7 +57,7 @@ if 'ChensBOTv2' not in dblist:# mongodb初始化
 
     config_col = db['cb_config']
     version = 'v1.0.0b'
-    config_dict = {'version' : version, 'timezone' : timezone}
+    config_dict = {'version' : version}
     config_col.insert_one(config_dict)
     print('已经导入5个集合')
 

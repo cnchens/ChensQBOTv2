@@ -8,17 +8,33 @@ import wmi
 import psutil
 import platform
 
-cpuinfo = wmi.WMI()
-for cpu in cpuinfo.Win32_Processor():# cpu使用
-    cpuname = cpu.Name
-    cpuload = str(cpu.LoadPercentage) + '%'
-cpucore = str(psutil.cpu_count(logical=False))# cpu物理核心
-cpulogcore = str(psutil.cpu_count(logical=True))# cpu逻辑核心
-# 内存使用
-free = str(round(psutil.virtual_memory().free / (1024.0 * 1024.0 * 1024.0), 2))+'GB'
-total = str(round(psutil.virtual_memory().total / (1024.0 * 1024.0 * 1024.0), 2))+'GB'
-# 操作系统
-osinfo = platform.platform()
+f = open('src/config/chensbot_config.json', 'r', encoding='utf-8')# 读取config
+json_res = json.load(f)
+mdb_conn = json_res['mdb_conn']# mongodb连接地址
+
+client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
+db = client['ChensBOTv2']
+
+config_col = db['cb_config']
+rootuser_col = db['admin_rootuser']
+t0op_col = db['admin_t0op']
+t1op_col = db['admin_t1op']
+t2op_col = db['admin_t2op']
+
+delcount = str(t0op_col.delete_many({'grp' : '114', 'qid' : '114'}).deleted_count)
+print(type(delcount))
+
+# cpuinfo = wmi.WMI()
+# for cpu in cpuinfo.Win32_Processor():# cpu使用
+#     cpuname = cpu.Name
+#     cpuload = str(cpu.LoadPercentage) + '%'
+# cpucore = str(psutil.cpu_count(logical=False))# cpu物理核心
+# cpulogcore = str(psutil.cpu_count(logical=True))# cpu逻辑核心
+# # 内存使用
+# free = str(round(psutil.virtual_memory().free / (1024.0 * 1024.0 * 1024.0), 2))+'GB'
+# total = str(round(psutil.virtual_memory().total / (1024.0 * 1024.0 * 1024.0), 2))+'GB'
+# # 操作系统
+# osinfo = platform.platform()
 # cpuinfo = wmi.WMI()
 # for cpu in cpuinfo.Win32_Processor():
 #     cpuname = cpu.Name

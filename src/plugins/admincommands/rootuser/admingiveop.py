@@ -36,23 +36,20 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
             isrootuser = False
             pass
     if isrootuser == True:
-        mdbtz_time = ''
-        for i in config_col.find():
-            timezone = i['timezone']
-            mdbtz_time = datetime.datetime.now(tz=pytz.timezone(timezone)).strftime('%Y-%m-%d %H:%M:%S')
         if len(receive_msg) == 4:
             try:
+                mdbtz_time = datetime.datetime.now(tz=pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
                 if receive_msg[1] == 'this':
                     op_level = receive_msg[2]
                     qid = receive_msg[3]
                     if op_level == '0':
-                        t0op_col.insert_many({'time' : mdbtz_time, 'grp' : request_grpid, 'qid' : qid})
+                        t0op_col.insert_one({'time' : mdbtz_time, 'grp' : request_grpid, 'qid' : qid})
                         await admingiveop.send(f'成功\n时间：{mdbtz_time}\n群组：{request_grpid}\n管理员：{qid}\n权限等级：0')
                     elif op_level == '1':
-                        t1op_col.insert_many({'time' : mdbtz_time, 'grp' : request_grpid, 'qid' : qid})
+                        t1op_col.insert_one({'time' : mdbtz_time, 'grp' : request_grpid, 'qid' : qid})
                         await admingiveop.send(f'成功\n时间：{mdbtz_time}\n群组：{request_grpid}\n管理员：{qid}\n权限等级：1')
                     elif op_level == '2':
-                        t2op_col.insert_many({'time' : mdbtz_time, 'grp' : request_grpid, 'qid' : qid})
+                        t2op_col.insert_one({'time' : mdbtz_time, 'grp' : request_grpid, 'qid' : qid})
                         await admingiveop.send(f'成功\n时间：{mdbtz_time}\n群组：{request_grpid}\n管理员：{qid}\n权限等级：2')
                     else:
                         await admingiveop.send(
@@ -76,13 +73,13 @@ QID：
                     op_level = receive_msg[2]
                     qid = receive_msg[3]
                     if op_level == '0':
-                        t0op_col.insert_many({'time' : mdbtz_time, 'grp' : grpid, 'qid' : qid})
+                        t0op_col.insert_one({'time' : mdbtz_time, 'grp' : grpid, 'qid' : qid})
                         await admingiveop.send(f'成功\n时间：{mdbtz_time}\n群组：{request_grpid}\n管理员：{qid}\n权限等级：0')
                     elif op_level == '1':
-                        t1op_col.insert_many({'time' : mdbtz_time, 'grp' : grpid, 'qid' : qid})
+                        t1op_col.insert_one({'time' : mdbtz_time, 'grp' : grpid, 'qid' : qid})
                         await admingiveop.send(f'成功\n时间：{mdbtz_time}\n群组：{request_grpid}\n管理员：{qid}\n权限等级：1')
                     elif op_level == '2':
-                        t2op_col.insert_many({'time' : mdbtz_time, 'grp' : grpid, 'qid' : qid})
+                        t2op_col.insert_one({'time' : mdbtz_time, 'grp' : grpid, 'qid' : qid})
                         await admingiveop.send(f'成功\n时间：{mdbtz_time}\n群组：{request_grpid}\n管理员：{qid}\n权限等级：2')
                     else:
                         await admingiveop.send(
