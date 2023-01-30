@@ -4,6 +4,27 @@
 # from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 import pymongo
 import json
+import wmi
+import psutil
+import platform
+
+cpuinfo = wmi.WMI()
+for cpu in cpuinfo.Win32_Processor():# cpu使用
+    cpuname = cpu.Name
+    cpuload = str(cpu.LoadPercentage) + '%'
+cpucore = str(psutil.cpu_count(logical=False))# cpu物理核心
+cpulogcore = str(psutil.cpu_count(logical=True))# cpu逻辑核心
+# 内存使用
+free = str(round(psutil.virtual_memory().free / (1024.0 * 1024.0 * 1024.0), 2))+'GB'
+total = str(round(psutil.virtual_memory().total / (1024.0 * 1024.0 * 1024.0), 2))+'GB'
+# 操作系统
+osinfo = platform.platform()
+# cpuinfo = wmi.WMI()
+# for cpu in cpuinfo.Win32_Processor():
+#     cpuname = cpu.Name
+#     cpuload = cpu.LoadPercentage
+#     print(cpuload)
+#     print("您的CPU已使用:%d%%" % cpu.LoadPercentage)
 
 # import time
 # for i in range(15):

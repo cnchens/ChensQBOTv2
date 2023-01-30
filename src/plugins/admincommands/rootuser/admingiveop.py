@@ -4,6 +4,8 @@ from nonebot.params import EventMessage
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 import pymongo
 import json
+import datetime
+import pytz
 
 f = open('src/config/chensbot_config.json', 'r', encoding='utf-8')# 读取config
 json_res = json.load(f)
@@ -13,6 +15,14 @@ client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
 db = client['ChensBOTv2']
 
 config_col = db['cb_config']
+rootuser_col = db['admin_rootuser']
+t0op_col = db['admin_t0op']
+t1op_col = db['admin_t1op']
+t2op_col = db['admin_t2op']
+
+for i in config_col.find():
+    timezone = i['timezone']
+mdbtz_time = datetime.datetime.now(tz=pytz.timezone(timezone)).strftime('%Y-%m-%d %H:%M:%S')
 
 admingiveop = on_command('admingiveop')
 
@@ -21,15 +31,15 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
     receive_msg = str(rxmsg).strip().split()
     request_qid = str(event.user_id)
     request_grpid = str(event.group_id)
-    if request_qid in config_col.find_one()['rootuser']:
+    if request_qid in rootuser_col.find_one()['rootuser']:
         if len(receive_msg) == 4:
             try:
                 if receive_msg[1] == 'this':
                     op_level = receive_msg[2]
                     qid = receive_msg[3]
                     if op_level == '0':
-                        config_col.update_many({'_id' : '0'}, {'$push' : {'t0_op' : {'qid' : qid, 'grp' : request_grpid}}})
-                        await admingiveop.send(f'成功\n群组：{request_grpid}\n管理员：{qid}\n权限等级：{op_level}')
+                        t0op_col.insert_many({'time' : mdbtz_time, 'grp' : request_grpid, 'qid' : qid})
+                        await admingiveop.send(f'成功\n时间：{mdbtz_time}\n群组：{request_grpid}\n管理员：{qid}')
                     elif op_level == '1':
                         config_col.update_many({'_id' : '0'}, {'$push' : {'t1_op' : {'qid' : qid, 'grp' : request_grpid}}})
                         await admingiveop.send(f'成功\n群组：{request_grpid}\n管理员：{qid}\n权限等级：{op_level}')
