@@ -1,4 +1,5 @@
 from nonebot.plugin.on import on_command
+from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.adapters import Message
 from nonebot.params import EventMessage
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
@@ -12,7 +13,7 @@ matcher = on_command('test')
 
 @matcher.handle()
 async def _(event: GroupMessageEvent):
-    await matcher.send('[CQ:at,qq=349256817]t')
+    await matcher.send(MessageSegment.image('src/static/image/groupmgmt/group_increase/group_increase_homo.jpg'))
 
 # f = open('src/config/chensbot_config.json', 'r', encoding='utf-8')# 读取config
 # json_res = json.load(f)

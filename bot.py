@@ -143,7 +143,7 @@ if __name__ == '__main__':
         'src/plugins/admincommands/t0op', # t0权限管理员指令
         'src/plugins/admincommands/t1op', # t1权限管理员指令
         'src/plugins/admincommands/t2op', # t2权限管理员指令
-        'src/plugins/test' # 测试
+        # 'src/plugins/test' # 测试
     )
 
     nonebot.run()

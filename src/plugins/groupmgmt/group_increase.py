@@ -1,10 +1,15 @@
 from nonebot.plugin.on import on_notice
+from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.adapters.onebot.v11.event import GroupIncreaseNoticeEvent
+from nonebot.adapters.onebot.v11.bot import Bot
+from urllib.request import Request, urlopen
+from urllib.parse import urlencode
 import pymongo
 import json
 import time
 import datetime
 import pytz
+import ast
 
 f = open('src/config/chensbot_config.json', 'r', encoding='utf-8')# 读取config
 json_res = json.load(f)
@@ -15,158 +20,63 @@ db = client['ChensQBOTv2']
 
 ban_col = db['banlist']
 kick_col = db['kicklist']
+grp_col = db['grp_members']
 
 matcher = on_notice()
 
 @matcher.handle()
-async def _(event: GroupIncreaseNoticeEvent):
+async def _(event: GroupIncreaseNoticeEvent, bot: Bot):
     request_qid = str(event.user_id)
     request_grpid = str(event.group_id)
 
-    # global_variable
+    # 全局变量 防止报错
     kicked = False
     ban_col_findout = {}
 
-    # ban_kick
+    # 联合封禁
     for i in ban_col.find():
-        if at_qid in i['ban_qid']:
+        if request_qid in i['qid']:
             ban_col_findout = i
             pass
         else:
             pass
     
     if len(ban_col_findout) != 0:
-        ban_reason = ban_col_findout['ban_reason']
-        ban_time = ban_col_findout['ban_time']
-        await matcher.send(f'BANBOT联合封禁：您已经被封禁，如有疑问请联系该群群主或群管理员！\n最后一次封禁于{ban_time}\n封禁原因：{ban_reason}')
-        kick_grpid = matcher.event.group_id
-        kick_qid = matcher.event.user_id
+        ban_reason = ban_col_findout['reason']
+        ban_time = ban_col_findout['time']
+        ban_grp = ban_col_findout['grp']
+        await matcher.send(MessageSegment.at(request_qid) + f'联合封禁：您已经被封禁，如有疑问请联系该群群主或群管理员！\n最后一次封禁于：{ban_time}\n封禁群组：{ban_grp}\n封禁原因：{ban_reason}')
+        kick_grpid = event.group_id
+        kick_qid = event.user_id
         time.sleep(1)
         await bot.set_group_kick(group_id=kick_grpid, user_id=kick_qid)
 
-        gmt8 = 'Asia/Shanghai'
-        gmt8_time = datetime.datetime.now(tz=pytz.timezone(gmt8)).strftime('%Y-%m-%d %H:%M:%S')
+        gmt8_time = datetime.datetime.now(tz=pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
 
         kick_grpid = str(kick_grpid)
         kick_qid = str(kick_qid)
-        up_dict = {
-            'kick_time' : gmt8_time, 
-            'kick_grp' : kick_grpid, 
-            'kick_qid' : kick_qid, 
-            'kick_reason' : 'Automatic Kick by banlist', 
-            'performer' : 'BOT'
-        }
-
-        kick_col.insert_one(up_dict)
+        kick_col.insert_one(
+            {
+                'time' : gmt8_time, 
+                'grp' : kick_grpid, 
+                'qid' : kick_qid, 
+                'reason' : '联合封禁自动踢出', 
+                'operator' : 'BOT'
+            }
+        )
 
         kicked = True
     else:
         kicked = False
         pass
 
-    at_qid = str(matcher.event.user_id)
-    join_grp = str(matcher.event.group_id)
-    
-    # akt外群去重
-    for i in grp_col.find():
-        if at_qid in i['qid']:
-            for j in cannot_enter_grp:
-                if join_grp in j:
-                    if i['status'] == 'in_grp':
-                        await matcher.send(f'BANBOT自动踢出\n[CQ:at,qq={at_qid}]您已添加过其他群，请勿重复添加，占用资源！')
-
-                        kick_grpid = matcher.event.group_id
-                        kick_qid = matcher.event.user_id
-                        time.sleep(1)
-
-                        gmt8 = 'Asia/Shanghai'
-                        gmt8_time = datetime.datetime.now(tz=pytz.timezone(gmt8)).strftime('%Y-%m-%d %H:%M:%S')
-                        
-                        kick_grpid = str(matcher.event.group_id)
-                        kick_qid = str(matcher.event.user_id)
-
-                        up_dict = {
-                            'ban_time' : gmt8_time, 
-                            'ban_grp' : kick_grpid, 
-                            'ban_qid' : kick_qid, 
-                            'ban_reason' : '您已添加过其他群，请勿重复添加，占用资源！[code00001]', 
-                            'performer' : 'BOT'
-                        }
-
-                        ban_col.insert_one(up_dict)
-
-                        
-                        await bot.set_group_kick(group_id=kick_grpid, user_id=kick_qid)
-
-                        gmt8 = 'Asia/Shanghai'
-                        gmt8_time = datetime.datetime.now(tz=pytz.timezone(gmt8)).strftime('%Y-%m-%d %H:%M:%S')
-
-                        kicked = True
-                        break
-                    else:
-                        kicked = False
-                        pass
-                else:
-                    kicked = False
-                    pass
-
-    grpid = str(matcher.event.group_id)
-    at_qid = str(matcher.event.user_id)
-
     # 入群欢迎
     if kicked == True:
         pass
-    elif kicked == False:
-        if grpid == '760327885':# aniakt
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '706125200':# only
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群是吧，给我撅三回啊三回')
-        elif grpid == '544033107':# gsakt
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群是吧，给我撅三回啊三回')
-        elif grpid == '511824025':# akt4
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '317096220':# akt2
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '730804591':# akt3
-            await matcher.send(f'[CQ:at,qq={at_qid}]加新群760327885')
-        elif grpid == '793395527':# 原神崩坏交流群
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '774244770':# akt5
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '784793447':# akt6
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '785056064':# akt7
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '784733617':# akt8
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '784956578':# akt9
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '784700021':# akt10
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '123881900':# akt11
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '320202467':# akt12
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '195943111':# akt13
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '238106549':# akt14
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        elif grpid == '326570597':# akt15
-            await matcher.send(f'[CQ:at,qq={at_qid}]进群看公告，有事找群主')
-        
-        else:
-            pass
     else:
-        pass
+        await matcher.send(MessageSegment.at(request_qid) + '欢迎入群')
 
-    finder_qid = at_qid
-
-    # gmt8_time = '无法获取'
-    # repo_qqlm = '无法获取'
-    # repo_phone = '无法获取'
-    # repo_ph_place = '无法获取'
-    # repo_wid = '无法获取'
-    # repo_lol = '无法获取'
+    finder_qid = request_qid
 
     try:
         global repo_phone, repo_ph_place
@@ -263,14 +173,13 @@ async def _(event: GroupIncreaseNoticeEvent):
     except:
         repo_qqlm = '获取失败'
 
-    gmt8 = 'Asia/Shanghai'
-    gmt8_time = datetime.datetime.now(tz=pytz.timezone(gmt8)).strftime('%Y-%m-%d %H:%M:%S')
+    gmt8_time = datetime.datetime.now(tz=pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
 
     add_dict = {
         'join_time' : gmt8_time, 
-        'grp' : grpid, 
+        'grp' : request_grpid, 
         'status' : 'in_grp', 
-        'qid' : at_qid, 
+        'qid' : request_qid, 
         'qqlm' : repo_qqlm, 
         'phone' : repo_phone,
         'phone_location' : repo_ph_place, 
