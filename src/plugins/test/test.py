@@ -1,28 +1,34 @@
-# from nonebot.plugin.on import on_command
-# from nonebot.adapters import Message
-# from nonebot.params import EventMessage
-# from nonebot.adapters.onebot.v11.event import GroupMessageEvent
+from nonebot.plugin.on import on_command
+from nonebot.adapters import Message
+from nonebot.params import EventMessage
+from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 import pymongo
 import json
 import wmi
 import psutil
 import platform
 
-f = open('src/config/chensbot_config.json', 'r', encoding='utf-8')# 读取config
-json_res = json.load(f)
-mdb_conn = json_res['mdb_conn']# mongodb连接地址
+matcher = on_command('test')
 
-client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
-db = client['ChensBOTv2']
+@matcher.handle()
+async def _(event: GroupMessageEvent):
+    await matcher.send('[CQ:at,qq=349256817]t')
 
-config_col = db['cb_config']
-rootuser_col = db['admin_rootuser']
-t0op_col = db['admin_t0op']
-t1op_col = db['admin_t1op']
-t2op_col = db['admin_t2op']
-
-delcount = str(t0op_col.delete_many({'grp' : '114', 'qid' : '114'}).deleted_count)
-print(type(delcount))
+# f = open('src/config/chensbot_config.json', 'r', encoding='utf-8')# 读取config
+# json_res = json.load(f)
+# mdb_conn = json_res['mdb_conn']# mongodb连接地址
+# 
+# client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
+# db = client['ChensBOTv2']
+# 
+# config_col = db['cb_config']
+# rootuser_col = db['admin_rootuser']
+# t0op_col = db['admin_t0op']
+# t1op_col = db['admin_t1op']
+# t2op_col = db['admin_t2op']
+# 
+# delcount = str(t0op_col.delete_many({'grp' : '114', 'qid' : '114'}).deleted_count)
+# print(type(delcount))
 
 # cpuinfo = wmi.WMI()
 # for cpu in cpuinfo.Win32_Processor():# cpu使用

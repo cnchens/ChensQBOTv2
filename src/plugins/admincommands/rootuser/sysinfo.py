@@ -14,7 +14,7 @@ json_res = json.load(f)
 mdb_conn = json_res['mdb_conn']# mongodb连接地址
 
 client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
-db = client['ChensBOTv2']
+db = client['ChensQBOTv2']
 
 rootuser_col = db['admin_rootuser']
 

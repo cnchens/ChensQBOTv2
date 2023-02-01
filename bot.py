@@ -12,13 +12,13 @@ mdb_conn = json_res['mdb_conn']# mongodb连接地址
 
 client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
 dblist = client.list_database_names()
-if 'ChensBOTv2' not in dblist:# mongodb初始化
+if 'ChensQBOTv2' not in dblist:# mongodb初始化
     for i in range(5):
         time.sleep(1)
         print('\r', '首次运行，准备创建数据库（注意：请按照提示执行） ' + '{:d}'.format(4-i), end='', flush=True)
     print('\n')
 
-    db = client['ChensBOTv2']
+    db = client['ChensQBOTv2']
 
     gmt8_time = datetime.datetime.now(tz=pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -81,17 +81,17 @@ if 'ChensBOTv2' not in dblist:# mongodb初始化
     print('已经导入6个集合')
 
     mute_col = db['mutelist']
-    mute_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x', 'mute_time' : 'x', 'performer' : 'x'}
+    mute_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x', 'mute_time' : 'x', 'operator' : 'x'}
     mute_col.insert_one(mute_dict)
     print('已经导入7个集合')
 
     kick_col = db['kicklist']
-    kick_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x', 'reason' : 'x', 'performer' : 'x'}
+    kick_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x', 'reason' : 'x', 'operator' : 'x'}
     kick_col.insert_one(kick_dict)
     print('已经导入8个集合')
 
     ban_col = db['banlist']
-    ban_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x', 'reason' : 'x', 'performer' : 'x'}
+    ban_dict = {'time' : 'x', 'grp' : 'x', 'qid' : 'x', 'reason' : 'x', 'operator' : 'x'}
     ban_col.insert_one(ban_dict)
     print('已经导入9个集合')
 
@@ -143,7 +143,7 @@ if __name__ == '__main__':
         'src/plugins/admincommands/t0op', # t0权限管理员指令
         'src/plugins/admincommands/t1op', # t1权限管理员指令
         'src/plugins/admincommands/t2op', # t2权限管理员指令
-        # 'src/plugins/test' # 测试
+        'src/plugins/test' # 测试
     )
 
     nonebot.run()
