@@ -1,4 +1,5 @@
 from nonebot.plugin.on import on_command
+from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 import pymongo
 import json
@@ -41,23 +42,21 @@ async def _(event: GroupMessageEvent):
             cpucore = str(psutil.cpu_count(logical=False))# cpu物理核心
             cpulogcore = str(psutil.cpu_count(logical=True))# cpu逻辑核心
             # 内存使用
-            free = str(round(psutil.virtual_memory().free / (1024.0 * 1024.0 * 1024.0), 2))+'GB'
-            total = str(round(psutil.virtual_memory().total / (1024.0 * 1024.0 * 1024.0), 2))+'GB'
+            used = str(round(psutil.virtual_memory().used / (1024.0 * 1024.0 * 1024.0), 2))
+            total = str(round(psutil.virtual_memory().total / (1024.0 * 1024.0 * 1024.0), 2))
             # 操作系统
             osinfo = platform.platform()
-            await matcher.send(
+            await matcher.send(MessageSegment.at(request_qid) + '\n' + 
 f'''
 CPU：{cpuname}
-物理核心：{cpucore}
-逻辑核心：{cpulogcore}
+CPU核心：{cpucore}C{cpulogcore}T
 CPU使用：{cpuload}
-总内存：{total}
-可用内存：{free}
+内存：{used}/{total}GB
 操作系统：{osinfo}
 系统时间：{ostime}
 '''.strip()
             )
         except:
-            await matcher.send('错误：调用失败')
+            await matcher.send(MessageSegment.at(request_qid) + '错误：调用失败\n请前往 https://github.com/cnchens/ChensQBOTv2/ 提交issue报告')
     else:
-        await matcher.send('错误：权限不足')
+        await matcher.send(MessageSegment.at(request_qid) + '错误：权限不足')

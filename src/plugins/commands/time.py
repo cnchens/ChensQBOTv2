@@ -1,4 +1,5 @@
 from nonebot.plugin.on import on_command
+from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 import json
 import datetime
@@ -12,9 +13,10 @@ matcher = on_command('time')
 
 @matcher.handle()
 async def _(event: GroupMessageEvent):
+    request_qid = str(event.user_id)
     gmt8_time = datetime.datetime.now(tz=pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
     utc_time = datetime.datetime.now(tz=pytz.timezone('UTC')).strftime('%Y-%m-%d %H:%M:%S')
-    await matcher.send(
+    await matcher.send(MessageSegment.at(request_qid) + '\n' + 
 f'''
 当前GMT+8时间：{gmt8_time}
 当前UTC时间：{utc_time}
