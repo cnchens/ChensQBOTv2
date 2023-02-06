@@ -22,7 +22,7 @@ t1op_col = db['admin_t1op']
 t2op_col = db['admin_t2op']
 mute_col = db['mutelist']
 
-matcher = on_command('adminkick')
+matcher = on_command('adminmute')
 
 @matcher.handle()
 async def _(bot: Bot, event: GroupMessageEvent, rxmsg: Message = EventMessage()):
