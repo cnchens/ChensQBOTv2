@@ -134,7 +134,7 @@ if 'ChensQBOTv2' not in dblist:# mongodb初始化
                 'else' : 'x'
             }
     sgk_col.insert_one(sgk_dict)
-    print('已经导入6个集合')
+    print('已经导入13个集合')
 
     print('导入完成')
 
