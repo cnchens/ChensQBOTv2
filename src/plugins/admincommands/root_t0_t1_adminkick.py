@@ -84,14 +84,14 @@ async def _(bot: Bot, event: GroupMessageEvent, rxmsg: Message = EventMessage())
             await matcher.send(MessageSegment.at(request_qid) + '\n' + 
 '''
 示例：
-/adminban [GRPID] [QID] [REASON]
+/adminkick [GRPID] [QID] [REASON]
 GRPID：
 this -> 本群
 或指定某群ID
 QID：
-封禁的QID
+踢出的QID
 REASON：
-封禁的原因
+踢出的原因
 '''.strip()
             )
     else:
