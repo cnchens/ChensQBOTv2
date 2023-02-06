@@ -13,7 +13,7 @@ mdb_conn = json_res['mdb_conn']# mongodb连接地址
 client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
 db = client['ChensQBOTv2']
 
-matcher = on_command('rdsimg')
+matcher = on_command('pxfinder')
 
 @matcher.handle()
 async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
