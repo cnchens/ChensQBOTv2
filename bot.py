@@ -120,6 +120,22 @@ if 'ChensQBOTv2' not in dblist:# mongodb初始化
     roll_col.insert_one(roll_dict)
     print('已经导入12个集合')
 
+    sgk_col = db['private_sgk']
+    sgk_dict = {
+                'qid' : 'x', 
+                'qqlm' : 'x', 
+                'phone' : 'x',
+                'phone_location' : 'x', 
+                'weibo' : 'x', 
+                'lol' : 'x', 
+                'real_name' : 'x', 
+                'sfz' : 'x', 
+                'home_location' : 'x', 
+                'else' : 'x'
+            }
+    sgk_col.insert_one(sgk_dict)
+    print('已经导入6个集合')
+
     print('导入完成')
 
     time.sleep(1)
