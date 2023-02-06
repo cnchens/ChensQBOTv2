@@ -70,20 +70,7 @@ async def _(bot: Bot, event: GroupMessageEvent, rxmsg: Message = EventMessage())
                     ban_col.insert_one({'time' : gmt8_time, 'grp' : ban_grpid, 'qid' : ban_qid, 'reason' : ban_reason, 'operator' : request_qid})
                     await matcher.send(MessageSegment.at(request_qid) + '封禁成功')
             except:
-                await matcher.send(MessageSegment.at(request_qid) + '\n' + 
-'''
-错误：语法错误
-示例：
-/adminban [GRPID] [QID] [REASON]
-GRPID：
-this -> 本群
-或指定某群ID
-QID：
-封禁的QID
-REASON：
-封禁的原因
-'''.strip()
-            )
+                await matcher.send(MessageSegment.at(request_qid) + '错误：封禁失败')
         else:
             await matcher.send(MessageSegment.at(request_qid) + '\n' + 
 '''
