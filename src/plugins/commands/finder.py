@@ -316,5 +316,20 @@ INFO：
 要查询的信息
 '''.strip()
             )
+    else:
+        await matcher.send(MessageSegment.at(request_qid) + '\n' + 
+'''
+示例：
+/finder [MODE] [INFO]
+MODE：
+qid -> 通过QQ号查询信息
+wid -> 通过微博号查询信息
+lol -> 通过王者ID查询信息
+ph -> 通过手机号查询信息
+cqsgk -> 查询ChensQBOTv2私有库
+INFO：
+要查询的信息
+'''.strip()
+        )
     
     
