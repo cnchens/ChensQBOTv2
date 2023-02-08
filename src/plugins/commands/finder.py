@@ -15,6 +15,7 @@ mdb_conn = json_res['mdb_conn']# mongodb连接地址
 
 client = pymongo.MongoClient(mdb_conn)# mongodb连接地址
 db = client['ChensQBOTv2']
+prisgk_col = db['private_sgk']
 
 matcher = on_command('finder')
 
@@ -23,193 +24,285 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
     receive_msg = str(rxmsg).strip().split()
     request_qid = str(event.user_id)
     request_grpid = str(event.group_id)
-    await matcher.send(MessageSegment.at(request_qid) + '未开放')
 
     if len(receive_msg) == 3:
+        ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
+        find_mode = receive_msg[1]
+        find_data = receive_msg[2]
+        send_message = ''
+        in_prisgk = False
         if receive_msg[1] == 'qid':
-            ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
-            q2p_url = 'https://api.xywlapi.cc/qqapi'
-            q2p_data = {'qq' : receive_msg[2]}
+            # q2p
+            data = {'qq' : receive_msg[2]}
             data = urlencode(data).encode('UTF-8')
-            requ = Request(url=url, data=data, headers=ua)
+            requ = Request(url='https://api.xywlapi.cc/qqapi', data=data, headers=ua)
+            repo = urlopen(requ).read()
+            brepo_str = repo.decode()
+            brepo_dict = ast.literal_eval(brepo_str)
+            repo_stat = brepo_dict['status']
+            if repo_stat == 200:
+                repo_phone = brepo_dict['phone']
+                repo_ph_place = brepo_dict['phonediqu']
+                send_message = send_message + f'查询内容：{find_mode} -> {find_data}\n手机：{repo_phone}\n手机归属地：{repo_ph_place}'
+                
+                # p2w
+                
+                data = {'phone' : repo_phone}
+                data = urlencode(data).encode('UTF-8')
+                requ = Request(url='https://api.xywlapi.cc/wbphone', data=data, headers=ua)
+                repo = urlopen(requ).read()
+                brepo_str = repo.decode()
+                brepo_dict = ast.literal_eval(brepo_str)
+                repo_stat = brepo_dict['status']
+                if repo_stat == 200:
+                    repo_wid = brepo_dict['id']
+                    send_message = send_message + f'\n微博：{repo_wid}'
+                else:
+                    repo_msg = brepo_dict['message']
+                    send_message = send_message + f'\n微博：{repo_msg}'
+            else:
+                repo_msg = brepo_dict['message']
+                send_message = send_message + f'查询内容：{find_mode} -> {find_data}\n手机：{repo_msg}'
+                
+                # p2w
+                
+                data = {'phone' : repo_phone}
+                data = urlencode(data).encode('UTF-8')
+                requ = Request(url='https://api.xywlapi.cc/wbphone', data=data, headers=ua)
+                repo = urlopen(requ).read()
+                brepo_str = repo.decode()
+                brepo_dict = ast.literal_eval(brepo_str)
+                repo_stat = brepo_dict['status']
+                if repo_stat == 200:
+                    repo_wid = brepo_dict['id']
+                    send_message = send_message + f'\n微博：{repo_wid}'
+                else:
+                    repo_msg = brepo_dict['message']
+                    send_message = send_message + f'\n微博：{repo_msg}'
+
+            # q2l
+            data = {'qq' : receive_msg[2]}
+            data = urlencode(data).encode('UTF-8')
+            requ = Request(url='https://api.xywlapi.cc/qqlol', data=data, headers=ua)
+            repo = urlopen(requ).read()
+            brepo_str = repo.decode()
+            brepo_dict = ast.literal_eval(brepo_str)
+            repo_stat = brepo_dict['status']
+            if repo_stat == 200:
+                repo_name = brepo_dict['name']
+                repo_daqu = brepo_dict['daqu']
+                send_message = send_message + f'\n王者ID：{repo_name}\n所属区服：{repo_daqu}'
+            else:
+                repo_msg = brepo_dict['message']
+                send_message = send_message + f'\n王者ID：{repo_msg}'
+
+            # q2pwd
+            data = {'qq' : receive_msg[1]}
+            data = urlencode(data).encode('UTF-8')
+            requ = Request(url='https://api.xywlapi.cc/qqlm', data=data, headers=ua)
             repo = urlopen(requ).read()
             brepo_str = repo.decode()
             brepo_dict = ast.literal_eval(brepo_str)
 
-            p2q_url = 'https://api.xywlapi.cc/qqphone'
-            p2q_data = {'phone' : receive_msg[2]}
+            repo_stat = brepo_dict['status']
+            if repo_stat == 200:
+                repo_qqlm = brepo_dict['qqlm']
+                send_message = send_message + f'\nQQ老密：{repo_qqlm}'
+            else:
+                repo_msg = brepo_dict['message']
+                send_message = send_message + f'\nQQ老密：{repo_msg}'
+        
+            for i in prisgk_col.find():
+                if i['qid'] == receive_msg[2]:
+                    up_time = i['time']
+                    qid = i['qid']
+                    qqlm = i['qqlm']
+                    phone = i['phone']
+                    phone_location = i['phone_location']
+                    weibo = i['weibo']
+                    lol = i['lol']
+                    real_name = i['real_name']
+                    sfz = i['sfz']
+                    home_location = i['home_location']
+                    col_else = i['else']
+                    send_message = send_message + f'\nChensQBOTv2私有库：\n上传时间：{up_time}\nQQ号：{qid}\nQQ老密：{qqlm}\n手机号：{phone}\n手机归属地：{phone_location}\n微博：{weibo}\n王者ID：{lol}\n真实姓名：{real_name}\n身份证：{sfz}\n地址：{home_location}\n其他：{col_else}'
+                    in_prisgk = True
+                    pass
+                else:
+                    in_prisgk = False
+                    pass
 
+            if in_prisgk == True:
+                await matcher.send(MessageSegment.at(request_qid) + send_message)
+            else:
+                send_message = send_message + '\nChensQBOTv2私有库：没有找到'
+                await matcher.send(MessageSegment.at(request_qid) + send_message)
 
+        elif receive_msg[1] == 'wid':
+            # w2p
+            data = {'id' : receive_msg[1]}
+            data = urlencode(data).encode('UTF-8')
+            requ = Request(url='https://api.xywlapi.cc/wbapi', data=data, headers=ua)
+            repo = urlopen(requ).read()
+            brepo_str = repo.decode()
+            brepo_dict = ast.literal_eval(brepo_str)
 
-    if receive_msg[0] == 'q2p':
-        ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
-        url = 'https://api.xywlapi.cc/qqapi'
-        data = {'qq' : receive_msg[1]}
-        data = urlencode(data).encode('UTF-8')
-        requ = Request(url=url, data=data, headers=ua)
-        repo = urlopen(requ).read()
-        brepo_str = repo.decode()
-        brepo_dict = ast.literal_eval(brepo_str)
+            repo_stat = brepo_dict['status']
+            if repo_stat == 200:
+                repo_phone = brepo_dict['phone']
+                repo_ph_place = brepo_dict['phonediqu']
+                send_message = send_message + f'查询内容：{find_mode} -> {find_data}\n手机：{repo_phone}\n手机归属地：{repo_ph_place}'
+                for i in prisgk_col.find():
+                    if i['weibo'] == receive_msg[2]:
+                        up_time = i['time']
+                        qid = i['qid']
+                        qqlm = i['qqlm']
+                        phone = i['phone']
+                        phone_location = i['phone_location']
+                        weibo = i['weibo']
+                        lol = i['lol']
+                        real_name = i['real_name']
+                        sfz = i['sfz']
+                        home_location = i['home_location']
+                        col_else = i['else']
+                        send_message = send_message + f'\nChensQBOTv2私有库：\n上传时间：{up_time}\nQQ号：{qid}\nQQ老密：{qqlm}\n手机号：{phone}\n手机归属地：{phone_location}\n微博：{weibo}\n王者ID：{lol}\n真实姓名：{real_name}\n身份证：{sfz}\n地址：{home_location}\n其他：{col_else}'
+                        in_prisgk = True
+                        pass
+                    else:
+                        in_prisgk = False
+                        pass
+                if in_prisgk == True:
+                    await matcher.send(MessageSegment.at(request_qid) + send_message)
+                else:
+                    send_message = send_message + '\nChensQBOTv2私有库：没有找到'
+                    await matcher.send(MessageSegment.at(request_qid) + send_message)
+            else:
+                repo_msg = brepo_dict['message']
+                send_message = send_message + f'查询内容：{find_mode} -> {find_data}\n手机：{repo_msg}'
+                for i in prisgk_col.find():
+                    if i['weibo'] == receive_msg[2]:
+                        up_time = i['time']
+                        qid = i['qid']
+                        qqlm = i['qqlm']
+                        phone = i['phone']
+                        phone_location = i['phone_location']
+                        weibo = i['weibo']
+                        lol = i['lol']
+                        real_name = i['real_name']
+                        sfz = i['sfz']
+                        home_location = i['home_location']
+                        col_else = i['else']
+                        send_message = send_message + f'\nChensQBOTv2私有库：\n上传时间：{up_time}\nQQ号：{qid}\nQQ老密：{qqlm}\n手机号：{phone}\n手机归属地：{phone_location}\n微博：{weibo}\n王者ID：{lol}\n真实姓名：{real_name}\n身份证：{sfz}\n地址：{home_location}\n其他：{col_else}'
+                        in_prisgk = True
+                        pass
+                    else:
+                        in_prisgk = False
+                        pass
+                if in_prisgk == True:
+                    await matcher.send(MessageSegment.at(request_qid) + send_message)
+                else:
+                    send_message = send_message + '\nChensQBOTv2私有库：没有找到'
+                    await matcher.send(MessageSegment.at(request_qid) + send_message)
 
-        repo_stat = brepo_dict['status']
-        if repo_stat == 200:
-            repo_msg = brepo_dict['message']
-            repo_qid = brepo_dict['qq']
-            repo_phone = brepo_dict['phone']
-            repo_ph_place = brepo_dict['phonediqu']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}\n查询qid：{repo_qid}\n绑定手机：{repo_phone}\n归属地：{repo_ph_place}'
-            await session.send(send_message)
+        elif receive_msg[1] == 'lol':
+            # l2q
+            data = {'name' : receive_msg[1]}
+            data = urlencode(data).encode('UTF-8')
+            requ = Request(url='https://api.xywlapi.cc/lolname', data=data, headers=ua)
+            repo = urlopen(requ).read()
+            brepo_str = repo.decode()
+            brepo_dict = ast.literal_eval(brepo_str)
+
+            repo_stat = brepo_dict['status']
+            if repo_stat == 200:
+                repo_qid = brepo_dict['qq']
+                send_message = send_message + f'查询内容：{find_mode} -> {find_data}\nQQ号：{repo_qid}'
+                for i in prisgk_col.find():
+                    if i['lol'] == receive_msg[2]:
+                        up_time = i['time']
+                        qid = i['qid']
+                        qqlm = i['qqlm']
+                        phone = i['phone']
+                        phone_location = i['phone_location']
+                        weibo = i['weibo']
+                        lol = i['lol']
+                        real_name = i['real_name']
+                        sfz = i['sfz']
+                        home_location = i['home_location']
+                        col_else = i['else']
+                        send_message = send_message + f'\nChensQBOTv2私有库：\n上传时间：{up_time}\nQQ号：{qid}\nQQ老密：{qqlm}\n手机号：{phone}\n手机归属地：{phone_location}\n微博：{weibo}\n王者ID：{lol}\n真实姓名：{real_name}\n身份证：{sfz}\n地址：{home_location}\n其他：{col_else}'
+                        in_prisgk = True
+                        pass
+                    else:
+                        in_prisgk = False
+                        pass
+                if in_prisgk == True:
+                    await matcher.send(MessageSegment.at(request_qid) + send_message)
+                else:
+                    send_message = send_message + '\nChensQBOTv2私有库：没有找到'
+                    await matcher.send(MessageSegment.at(request_qid) + send_message)
+
+            else:
+                repo_msg = brepo_dict['message']
+                send_message = send_message + f'查询内容：{find_mode} -> {find_data}\nQQ号：{repo_msg}'
+                for i in prisgk_col.find():
+                    if i['lol'] == receive_msg[2]:
+                        up_time = i['time']
+                        qid = i['qid']
+                        qqlm = i['qqlm']
+                        phone = i['phone']
+                        phone_location = i['phone_location']
+                        weibo = i['weibo']
+                        lol = i['lol']
+                        real_name = i['real_name']
+                        sfz = i['sfz']
+                        home_location = i['home_location']
+                        col_else = i['else']
+                        send_message = send_message + f'\nChensQBOTv2私有库：\n上传时间：{up_time}\nQQ号：{qid}\nQQ老密：{qqlm}\n手机号：{phone}\n手机归属地：{phone_location}\n微博：{weibo}\n王者ID：{lol}\n真实姓名：{real_name}\n身份证：{sfz}\n地址：{home_location}\n其他：{col_else}'
+                        in_prisgk = True
+                        pass
+                    else:
+                        in_prisgk = False
+                        pass
+                if in_prisgk == True:
+                    await matcher.send(MessageSegment.at(request_qid) + send_message)
+                else:
+                    send_message = send_message + '\nChensQBOTv2私有库：没有找到'
+                    await matcher.send(MessageSegment.at(request_qid) + send_message)
+
+        elif receive_msg[1] == 'ph':
+            #     elif receive_msg[0] == 'p2q':
+#         ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
+#         url = 'https://api.xywlapi.cc/qqphone'
+#         data = {'phone' : receive_msg[1]}
+#         data = urlencode(data).encode('UTF-8')
+#         requ = Request(url=url, data=data, headers=ua)
+#         repo = urlopen(requ).read()
+#         brepo_str = repo.decode()
+#         brepo_dict = ast.literal_eval(brepo_str)
+# 
+#         repo_stat = brepo_dict['status']
+#         if repo_stat == 200:
+#             repo_msg = brepo_dict['message']
+#             repo_qid = brepo_dict['qq']
+#             repo_phone = receive_msg[1]
+#             repo_ph_place = brepo_dict['phonediqu']
+#             send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}\n查询手机：{repo_phone}\n绑定qid：{repo_qid}\n归属地：{repo_ph_place}'
+#             await session.send(send_message)
+#         else:
+#             repo_msg = brepo_dict['message']
+#             send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}'
+#             await session.send(send_message)
+# 
+#     elif receive_msg[0] == 'l2q':
+#         ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
+#     
+            await matcher.send(MessageSegment.at(request_qid) + '暂时停用')
+        elif receive_msg[1] == 'cqsgk':
+            for i in prisgk_col.find():
+                await matcher.send(MessageSegment.at(request_qid) + '暂时停用')
         else:
-            repo_msg = brepo_dict['message']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}'
-            await session.send(send_message)
-
-    elif receive_msg[0] == 'p2q':
-        ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
-        url = 'https://api.xywlapi.cc/qqphone'
-        data = {'phone' : receive_msg[1]}
-        data = urlencode(data).encode('UTF-8')
-        requ = Request(url=url, data=data, headers=ua)
-        repo = urlopen(requ).read()
-        brepo_str = repo.decode()
-        brepo_dict = ast.literal_eval(brepo_str)
-
-        repo_stat = brepo_dict['status']
-        if repo_stat == 200:
-            repo_msg = brepo_dict['message']
-            repo_qid = brepo_dict['qq']
-            repo_phone = receive_msg[1]
-            repo_ph_place = brepo_dict['phonediqu']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}\n查询手机：{repo_phone}\n绑定qid：{repo_qid}\n归属地：{repo_ph_place}'
-            await session.send(send_message)
-        else:
-            repo_msg = brepo_dict['message']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}'
-            await session.send(send_message)
-
-    elif receive_msg[0] == 'q2l':
-        ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
-        url = 'https://api.xywlapi.cc/qqlol'
-        data = {'qq' : receive_msg[1]}
-        data = urlencode(data).encode('UTF-8')
-        requ = Request(url=url, data=data, headers=ua)
-        repo = urlopen(requ).read()
-        brepo_str = repo.decode()
-        brepo_dict = ast.literal_eval(brepo_str)
-
-        repo_stat = brepo_dict['status']
-        if repo_stat == 200:
-            repo_msg = brepo_dict['message']
-            repo_qid = brepo_dict['qq']
-            repo_name = brepo_dict['name']
-            repo_daqu = brepo_dict['daqu']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}\n查询qid：{repo_qid}\n游戏名：{repo_name}\n服务器：{repo_daqu}'
-            await session.send(send_message)
-        else:
-            repo_msg = brepo_dict['message']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}'
-            await session.send(send_message)
-
-    elif receive_msg[0] == 'l2q':
-        ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
-        url = 'https://api.xywlapi.cc/lolname'
-        data = {'name' : receive_msg[1]}
-        data = urlencode(data).encode('UTF-8')
-        requ = Request(url=url, data=data, headers=ua)
-        repo = urlopen(requ).read()
-        brepo_str = repo.decode()
-        brepo_dict = ast.literal_eval(brepo_str)
-
-        repo_stat = brepo_dict['status']
-        if repo_stat == 200:
-            repo_msg = brepo_dict['message']
-            repo_qid = brepo_dict['qq']
-            repo_name = brepo_dict['name']
-            repo_daqu = brepo_dict['daqu']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}\n查询游戏名：{repo_name}\n服务器：{repo_daqu}\n绑定qid：{repo_qid}'
-            await session.send(send_message)
-        else:
-            repo_msg = brepo_dict['message']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}'
-            await session.send(send_message)
-
-    elif receive_msg[0] == 'q2pwd':
-        ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
-        url = 'https://api.xywlapi.cc/qqlm'
-        data = {'qq' : receive_msg[1]}
-        data = urlencode(data).encode('UTF-8')
-        requ = Request(url=url, data=data, headers=ua)
-        repo = urlopen(requ).read()
-        brepo_str = repo.decode()
-        brepo_dict = ast.literal_eval(brepo_str)
-
-        repo_stat = brepo_dict['status']
-        if repo_stat == 200:
-            repo_msg = brepo_dict['message']
-            repo_qid = brepo_dict['qq']
-            repo_qqlm = brepo_dict['qqlm']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}\n查询qid：{repo_qid}\nlm_id：{repo_qqlm}'
-            await session.send(send_message)
-        else:
-            repo_msg = brepo_dict['message']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}'
-            await session.send(send_message)
-
-    elif receive_msg[0] == 'w2p':
-        ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
-        url = 'https://api.xywlapi.cc/wbapi'
-        data = {'id' : receive_msg[1]}
-        data = urlencode(data).encode('UTF-8')
-        requ = Request(url=url, data=data, headers=ua)
-        repo = urlopen(requ).read()
-        brepo_str = repo.decode()
-        brepo_dict = ast.literal_eval(brepo_str)
-
-        repo_stat = brepo_dict['status']
-        if repo_stat == 200:
-            repo_msg = brepo_dict['message']
-            wid = receive_msg[1]
-            repo_phone = brepo_dict['phone']
-            repo_ph_place = brepo_dict['phonediqu']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}\n查询微博id：{wid}\n绑定手机：{repo_phone}\n归属地：{repo_ph_place}'
-            await session.send(send_message)
-        else:
-            repo_msg = brepo_dict['message']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}'
-            await session.send(send_message)
-
-    elif receive_msg[0] == 'p2w':
-        ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
-        url = 'https://api.xywlapi.cc/wbphone'
-        data = {'phone' : receive_msg[1]}
-        data = urlencode(data).encode('UTF-8')
-        requ = Request(url=url, data=data, headers=ua)
-        repo = urlopen(requ).read()
-        brepo_str = repo.decode()
-        brepo_dict = ast.literal_eval(brepo_str)
-
-        repo_stat = brepo_dict['status']
-        if repo_stat == 200:
-            repo_msg = brepo_dict['message']
-            phone = receive_msg[1]
-            repo_wid = brepo_dict['id']
-            repo_ph_place = brepo_dict['phonediqu']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}\n查询手机：{phone}\n绑定微博id：{repo_wid}\n归属地：{repo_ph_place}'
-            await session.send(send_message)
-        else:
-            repo_msg = brepo_dict['message']
-            send_message = f'[CQ:at,qq={req_qid}]finder StatusCode：{repo_stat} {repo_msg}'
-            await session.send(send_message)
-
-    elif receive_msg[0] == 'sms':
-        await session.send('停用')
-        # client = pymongo.MongoClient('mongodb://192.168.1.114:27017/')
-        # dblist = client.list_database_names()
-        # db = client['QBOT_DB']
-        # col = db['sms_bomber_url']
-
-    else:
-    
+            await matcher.send(MessageSegment.at(request_qid) + '\n' + 
 '''
 示例：
 /finder [MODE] [INFO]
@@ -218,6 +311,10 @@ qid -> 通过QQ号查询信息
 wid -> 通过微博号查询信息
 lol -> 通过王者ID查询信息
 ph -> 通过手机号查询信息
+cqsgk -> 查询ChensQBOTv2私有库
 INFO：
 要查询的信息
-'''
+'''.strip()
+            )
+    
+    

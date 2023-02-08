@@ -122,6 +122,7 @@ if 'ChensQBOTv2' not in dblist:# mongodb初始化
 
     sgk_col = db['private_sgk']
     sgk_dict = {
+                'time' : 'x', 
                 'qid' : 'x', 
                 'qqlm' : 'x', 
                 'phone' : 'x',
