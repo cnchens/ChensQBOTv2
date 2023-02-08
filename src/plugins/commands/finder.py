@@ -29,7 +29,7 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
         ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
         find_mode = receive_msg[1]
         find_data = receive_msg[2]
-        send_message = ''
+        send_message = '\n'
         in_prisgk = False
         if receive_msg[1] == 'qid':
             # q2p
