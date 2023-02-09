@@ -16,7 +16,7 @@ t0op_col = db['admin_t0op']
 t1op_col = db['admin_t1op']
 t2op_col = db['admin_t2op']
 
-matcher = on_command('help')
+matcher = on_command('adminhelp')
 
 @matcher.handle()
 async def _(event: GroupMessageEvent):
