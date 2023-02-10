@@ -74,7 +74,7 @@ async def _(event: GroupIncreaseNoticeEvent, bot: Bot):
     if kicked == True:
         pass
     else:
-        await matcher.send(MessageSegment.at(request_qid) + '欢迎入群')
+        await matcher.send(MessageSegment.at(request_qid) + '欢迎入群，进群看公告')
 
     finder_qid = request_qid
 
