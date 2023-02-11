@@ -56,8 +56,8 @@ if 'ChensQBOTv2' not in dblist:# mongodb初始化
     print('已经导入4个集合')
 
     config_col = db['cb_config']
-    version = 'v1.0.0b'
-    config_dict = {'version' : version}
+    version = 'v1.0.0'
+    config_dict = {'version' : version, 'mcs_stat' : 'https://api.mcstatus.io/v2/status/', 'mcs_edition' : '', 'mcs_serverip' : ''}
     config_col.insert_one(config_dict)
     print('已经导入5个集合')
 
