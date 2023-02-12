@@ -31,7 +31,9 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
         find_data = receive_msg[2]
         send_message = '\n'
         in_prisgk = False
+
         if receive_msg[1] == 'qid':
+            global repo_phone
             # q2p
             data = {'qq' : receive_msg[2]}
             data = urlencode(data).encode('UTF-8')
@@ -41,8 +43,8 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
             brepo_dict = ast.literal_eval(brepo_str)
             repo_stat = brepo_dict['status']
             if repo_stat == 200:
-                repo_phone = brepo_dict['phone']
                 repo_ph_place = brepo_dict['phonediqu']
+                repo_phone = brepo_dict['phone']
                 send_message = send_message + f'查询内容：{find_mode} -> {find_data}\n手机：{repo_phone}\n手机归属地：{repo_ph_place}'
                 
                 # p2w
@@ -62,23 +64,7 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
                     send_message = send_message + f'\n微博：{repo_msg}'
             else:
                 repo_msg = brepo_dict['message']
-                send_message = send_message + f'查询内容：{find_mode} -> {find_data}\n手机：{repo_msg}'
-                
-                # p2w
-                
-                data = {'phone' : repo_phone}
-                data = urlencode(data).encode('UTF-8')
-                requ = Request(url='https://api.xywlapi.cc/wbphone', data=data, headers=ua)
-                repo = urlopen(requ).read()
-                brepo_str = repo.decode()
-                brepo_dict = ast.literal_eval(brepo_str)
-                repo_stat = brepo_dict['status']
-                if repo_stat == 200:
-                    repo_wid = brepo_dict['id']
-                    send_message = send_message + f'\n微博：{repo_wid}'
-                else:
-                    repo_msg = brepo_dict['message']
-                    send_message = send_message + f'\n微博：{repo_msg}'
+                send_message = send_message + f'查询内容：{find_mode} -> {find_data}\n手机：{repo_msg}\n微博：没有找到'
 
             # q2l
             data = {'qq' : receive_msg[2]}
