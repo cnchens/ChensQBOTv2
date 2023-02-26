@@ -35,68 +35,76 @@ async def _(event: GroupMessageEvent, rxmsg: Message = EventMessage()):
         if receive_msg[1] == 'qid':
             global repo_phone
             # q2p
-            data = {'qq' : receive_msg[2]}
-            data = urlencode(data).encode('UTF-8')
-            requ = Request(url='https://api.xywlapi.cc/qqapi', data=data, headers=ua)
-            repo = urlopen(requ).read()
-            brepo_str = repo.decode()
-            brepo_dict = ast.literal_eval(brepo_str)
-            repo_stat = brepo_dict['status']
-            if repo_stat == 200:
-                repo_ph_place = brepo_dict['phonediqu']
-                repo_phone = brepo_dict['phone']
-                send_message = send_message + f'查询内容：{find_mode} -> {find_data}\n手机：{repo_phone}\n手机归属地：{repo_ph_place}'
-                
-                # p2w
-                
-                data = {'phone' : repo_phone}
+            try:
+                data = {'qq' : receive_msg[2]}
                 data = urlencode(data).encode('UTF-8')
-                requ = Request(url='https://api.xywlapi.cc/wbphone', data=data, headers=ua)
+                requ = Request(url='https://api.xywlapi.cc/qqapi', data=data, headers=ua)
                 repo = urlopen(requ).read()
                 brepo_str = repo.decode()
                 brepo_dict = ast.literal_eval(brepo_str)
                 repo_stat = brepo_dict['status']
                 if repo_stat == 200:
-                    repo_wid = brepo_dict['id']
-                    send_message = send_message + f'\n微博：{repo_wid}'
+                    repo_ph_place = brepo_dict['phonediqu']
+                    repo_phone = brepo_dict['phone']
+                    send_message = send_message + f'查询内容：{find_mode} -> {find_data}\n手机：{repo_phone}\n手机归属地：{repo_ph_place}'
+                    
+                    # p2w
+                    
+                    data = {'phone' : repo_phone}
+                    data = urlencode(data).encode('UTF-8')
+                    requ = Request(url='https://api.xywlapi.cc/wbphone', data=data, headers=ua)
+                    repo = urlopen(requ).read()
+                    brepo_str = repo.decode()
+                    brepo_dict = ast.literal_eval(brepo_str)
+                    repo_stat = brepo_dict['status']
+                    if repo_stat == 200:
+                        repo_wid = brepo_dict['id']
+                        send_message = send_message + f'\n微博：{repo_wid}'
+                    else:
+                        repo_msg = brepo_dict['message']
+                        send_message = send_message + f'\n微博：{repo_msg}'
                 else:
                     repo_msg = brepo_dict['message']
-                    send_message = send_message + f'\n微博：{repo_msg}'
-            else:
-                repo_msg = brepo_dict['message']
-                send_message = send_message + f'查询内容：{find_mode} -> {find_data}\n手机：{repo_msg}\n微博：没有找到'
-
+                    send_message = send_message + f'查询内容：{find_mode} -> {find_data}\n手机：{repo_msg}\n微博：没有找到'
+            except:
+                send_message = send_message + f'查询内容：{find_mode} -> {find_data}\n手机：查询失败\n手机归属地：查询失败'
             # q2l
-            data = {'qq' : receive_msg[2]}
-            data = urlencode(data).encode('UTF-8')
-            requ = Request(url='https://api.xywlapi.cc/qqlol', data=data, headers=ua)
-            repo = urlopen(requ).read()
-            brepo_str = repo.decode()
-            brepo_dict = ast.literal_eval(brepo_str)
-            repo_stat = brepo_dict['status']
-            if repo_stat == 200:
-                repo_name = brepo_dict['name']
-                repo_daqu = brepo_dict['daqu']
-                send_message = send_message + f'\n王者ID：{repo_name}\n所属区服：{repo_daqu}'
-            else:
-                repo_msg = brepo_dict['message']
-                send_message = send_message + f'\n王者ID：{repo_msg}'
+            try:
+                data = {'qq' : receive_msg[2]}
+                data = urlencode(data).encode('UTF-8')
+                requ = Request(url='https://api.xywlapi.cc/qqlol', data=data, headers=ua)
+                repo = urlopen(requ).read()
+                brepo_str = repo.decode()
+                brepo_dict = ast.literal_eval(brepo_str)
+                repo_stat = brepo_dict['status']
+                if repo_stat == 200:
+                    repo_name = brepo_dict['name']
+                    repo_daqu = brepo_dict['daqu']
+                    send_message = send_message + f'\n王者ID：{repo_name}\n所属区服：{repo_daqu}'
+                else:
+                    repo_msg = brepo_dict['message']
+                    send_message = send_message + f'\n王者ID：{repo_msg}'
+            except:
+                send_message = send_message + f'\n王者ID：查询失败\n所属区服：查询失败'
 
             # q2pwd
-            data = {'qq' : receive_msg[1]}
-            data = urlencode(data).encode('UTF-8')
-            requ = Request(url='https://api.xywlapi.cc/qqlm', data=data, headers=ua)
-            repo = urlopen(requ).read()
-            brepo_str = repo.decode()
-            brepo_dict = ast.literal_eval(brepo_str)
+            try:
+                data = {'qq' : receive_msg[1]}
+                data = urlencode(data).encode('UTF-8')
+                requ = Request(url='https://api.xywlapi.cc/qqlm', data=data, headers=ua)
+                repo = urlopen(requ).read()
+                brepo_str = repo.decode()
+                brepo_dict = ast.literal_eval(brepo_str)
 
-            repo_stat = brepo_dict['status']
-            if repo_stat == 200:
-                repo_qqlm = brepo_dict['qqlm']
-                send_message = send_message + f'\nQQ老密：{repo_qqlm}'
-            else:
-                repo_msg = brepo_dict['message']
-                send_message = send_message + f'\nQQ老密：{repo_msg}'
+                repo_stat = brepo_dict['status']
+                if repo_stat == 200:
+                    repo_qqlm = brepo_dict['qqlm']
+                    send_message = send_message + f'\nQQ老密：{repo_qqlm}'
+                else:
+                    repo_msg = brepo_dict['message']
+                    send_message = send_message + f'\nQQ老密：{repo_msg}'
+            except:
+                send_message = send_message + f'\nQQ老密：查询失败'
         
             for i in prisgk_col.find():
                 if i['qid'] == receive_msg[2]:
