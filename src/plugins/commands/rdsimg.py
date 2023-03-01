@@ -12,8 +12,8 @@ matcher = on_command('rdsimg')
 async def _(event: GroupMessageEvent):
     request_qid = str(event.user_id)
     ua = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'}
-    # url = 'https://api.lolicon.app/setu/v2'
-    url = 'https://www.dmoe.cc/random.php?return=json'
+    url = 'https://api.lolicon.app/setu/v2'
+    # url = 'https://www.dmoe.cc/random.php?return=json'
     # data = {'r18' : 2, 'num' : 1}
     requ = Request(url=url, headers=ua)
     repo = urlopen(requ).read()
